@@ -120,7 +120,7 @@ const userRoutes: FastifyPluginAsync = async (app) => {
   });
 };
 
-function calculateMultiplier(bs: number): number {
+export function calculateMultiplier(bs: number): number {
   return parseFloat((bs / 100000).toFixed(2));
 }
 

@@ -17,6 +17,7 @@ app.register(cors, {
 app.register(prismaPlugin);
 app.register(import("./routes/users"));
 app.register(import("./routes/events"));
+app.register(import("./routes/claims"));
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
