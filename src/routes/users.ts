@@ -60,7 +60,11 @@ const userRoutes: FastifyPluginAsync = async (app) => {
   // PATCH /users/:telegramId
   app.patch("/users/:telegramId", async (req, reply) => {
     const telegramId = BigInt((req.params as any).telegramId);
-    const { bs, username } = req.body as { bs?: number; username?: string };
+    const { bs, username, banned } = req.body as {
+      bs?: number;
+      username?: string;
+      banned?: boolean;
+    };
 
     const user = await app.prisma.user.findUnique({ where: { telegramId } });
     if (!user) return reply.code(404).send({ error: "User not found" });
@@ -72,6 +76,7 @@ const userRoutes: FastifyPluginAsync = async (app) => {
         username: username ?? user.username,
         multiplier:
           bs !== undefined ? calculateMultiplier(bs) : user.multiplier,
+        isBanned: banned ?? user.isBanned,
       },
     });
 
