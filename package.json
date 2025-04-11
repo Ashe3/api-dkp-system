@@ -11,6 +11,7 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
+    "@fastify/cors": "^11.0.1",
     "@prisma/client": "^6.6.0",
     "fastify": "^5.2.2",
     "fastify-cors": "^6.1.0",

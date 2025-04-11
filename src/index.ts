@@ -1,5 +1,7 @@
 import Fastify from "fastify";
 import dotenv from "dotenv";
+import cors from "@fastify/cors";
+
 import prismaPlugin from "./plugins/prisma";
 
 dotenv.config();
@@ -8,6 +10,9 @@ const app = Fastify({
   logger: true,
 });
 
+app.register(cors, {
+  origin: process.env.CORS_ORIGIN,
+});
 app.register(prismaPlugin);
 app.register(import("./routes/users"));
 

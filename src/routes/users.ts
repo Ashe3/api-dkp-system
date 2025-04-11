@@ -1,6 +1,20 @@
 import { FastifyPluginAsync } from "fastify";
 
 const userRoutes: FastifyPluginAsync = async (app) => {
+  // GET /users — get all users
+  app.get("/users", async (req, reply) => {
+    const users = await app.prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+
+    return reply.send(
+      users.map((user) => ({
+        ...user,
+        telegramId: user.telegramId.toString(),
+      }))
+    );
+  });
+
   // POST /users — sign up
   app.post("/users", async (req, reply) => {
     const { telegramId, username } = req.body as {
