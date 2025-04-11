@@ -2,7 +2,7 @@ import { FastifyPluginAsync } from "fastify";
 import { calculateMultiplier } from "./users";
 
 const claimRoutes: FastifyPluginAsync = async (app) => {
-  app.post("/claims", async (req, reply) => {
+  app.post("/claim", async (req, reply) => {
     const { telegramId, code } = req.body as {
       telegramId: string;
       code: string;
@@ -43,7 +43,7 @@ const claimRoutes: FastifyPluginAsync = async (app) => {
       data: { dkp: user.dkp + amount },
     });
 
-    return reply.send({ success: true, amount });
+    return reply.send({ success: true, amount, code });
   });
 };
 

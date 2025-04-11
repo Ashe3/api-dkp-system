@@ -84,8 +84,9 @@ const userRoutes: FastifyPluginAsync = async (app) => {
   });
 
   // GET /users/:telegramId/history
-  app.get("/users/:telegramId/history", async (req, reply) => {
+  app.get("/users/:telegramId/history/:take", async (req, reply) => {
     const telegramId = BigInt((req.params as any).telegramId);
+    const take = Number((req.params as any).take) ?? 10;
 
     const user = await app.prisma.user.findUnique({ where: { telegramId } });
     if (!user) return reply.code(404).send({ error: "User not found" });
@@ -93,7 +94,7 @@ const userRoutes: FastifyPluginAsync = async (app) => {
     const history = await app.prisma.claim.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
-      take: 5,
+      take,
       include: {
         event: true,
       },
