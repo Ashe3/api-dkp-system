@@ -33,6 +33,13 @@ const actionRoutes: FastifyPluginAsync = async (app) => {
       },
     });
 
+    await app.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        dkp: { increment: Math.round(amount) },
+      },
+    });
+
     return res.status(201).send(action);
   });
 };
