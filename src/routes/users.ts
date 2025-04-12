@@ -54,6 +54,7 @@ const userRoutes: FastifyPluginAsync = async (app) => {
     });
 
     if (!user) return reply.code(404).send({ error: "User not found" });
+    if (user.isBanned) return reply.code(404).send({ error: "User is banned" });
     return reply.send({ ...user, telegramId: user.telegramId.toString() });
   });
 
@@ -68,6 +69,7 @@ const userRoutes: FastifyPluginAsync = async (app) => {
 
     const user = await app.prisma.user.findUnique({ where: { telegramId } });
     if (!user) return reply.code(404).send({ error: "User not found" });
+    if (user.isBanned) return reply.code(404).send({ error: "User is banned" });
 
     const updated = await app.prisma.user.update({
       where: { telegramId },
@@ -90,6 +92,7 @@ const userRoutes: FastifyPluginAsync = async (app) => {
 
     const user = await app.prisma.user.findUnique({ where: { telegramId } });
     if (!user) return reply.code(404).send({ error: "User not found" });
+    if (user.isBanned) return reply.code(404).send({ error: "User is banned" });
 
     const claims = await app.prisma.claim.findMany({
       where: { userId: user.id },

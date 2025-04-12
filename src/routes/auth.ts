@@ -15,8 +15,12 @@ const authRoutes: FastifyPluginAsync = async (app) => {
       where: { username },
     });
 
-    if (!operator || !operator.isActive) {
+    if (!operator) {
       return reply.code(401).send({ error: "Invalid credentials" });
+    }
+
+    if (!operator.isActive) {
+      return reply.code(403).send({ error: "Operator is not active" });
     }
 
     const isValid = await bcrypt.compare(password, operator.password);
