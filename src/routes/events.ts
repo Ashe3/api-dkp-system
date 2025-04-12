@@ -28,6 +28,28 @@ const eventRoutes: FastifyPluginAsync = async (app) => {
     return reply.send(event);
   });
 
+  app.get("/events/:code/users", async (req, reply) => {
+    const { code } = req.params as { code: string };
+
+    const event = await app.prisma.event.findUnique({
+      where: { code },
+    });
+
+    if (!event) return reply.code(404).send({ error: "Event not found" });
+
+    const claims = await app.prisma.claim.findMany({
+      where: { eventId: event.id },
+      include: {
+        user: {
+          select: { username: true },
+        },
+      },
+    });
+
+    const usernames = claims.map((claim) => claim.user.username);
+    return reply.send(usernames);
+  });
+
   app.post("/events", async (req, reply) => {
     const { title, reward, comment, durationMinutes } = req.body as {
       title: string;
