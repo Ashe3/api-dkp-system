@@ -28,7 +28,7 @@ const claimRoutes: FastifyPluginAsync = async (app) => {
       return reply.code(400).send({ error: "Already claimed" });
 
     const multiplier = calculateMultiplier(user.bs);
-    const amount = event.reward * multiplier;
+    const amount = Math.round(event.reward * multiplier);
 
     await app.prisma.claim.create({
       data: {

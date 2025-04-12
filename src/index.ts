@@ -18,6 +18,7 @@ app.register(prismaPlugin);
 app.register(import("./routes/users"));
 app.register(import("./routes/events"));
 app.register(import("./routes/claims"));
+app.register(import("./routes/operators"));
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
