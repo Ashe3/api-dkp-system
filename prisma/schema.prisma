@@ -22,7 +22,7 @@ model User {
 
 model Operator {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
+  username  String   @unique
   password  String // bcrypt hash
   role      String   @default("operator") // or 'admin'
   isActive  Boolean  @default(false)
