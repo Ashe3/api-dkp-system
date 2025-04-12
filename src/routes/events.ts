@@ -46,17 +46,21 @@ const eventRoutes: FastifyPluginAsync = async (app) => {
       },
     });
 
-    const usernames = claims.map((claim) => claim.user.username);
+    const usernames = claims
+      .map((claim) => claim.user?.username)
+      .filter(Boolean);
     return reply.send(usernames);
   });
 
   app.post("/events", async (req, reply) => {
-    const { title, reward, comment, durationMinutes } = req.body as {
-      title: string;
-      reward: number;
-      comment?: string;
-      durationMinutes?: number;
-    };
+    const { title, reward, comment, durationMinutes, createdById } =
+      req.body as {
+        title: string;
+        reward: number;
+        comment?: string;
+        durationMinutes?: number;
+        createdById?: number;
+      };
 
     const code = generateCode(5);
     const minutes = Math.max(1, durationMinutes ?? 5);
@@ -69,6 +73,7 @@ const eventRoutes: FastifyPluginAsync = async (app) => {
         comment,
         code,
         expiresAt,
+        createdById: createdById ?? null,
       },
     });
 
