@@ -69,7 +69,8 @@ const userRoutes: FastifyPluginAsync = async (app) => {
 
     const user = await app.prisma.user.findUnique({ where: { telegramId } });
     if (!user) return reply.code(404).send({ error: "User not found" });
-    if (user.isBanned) return reply.code(404).send({ error: "User is banned" });
+    if (user.isBanned && banned !== false)
+      return reply.code(404).send({ error: "User is banned" });
 
     const updated = await app.prisma.user.update({
       where: { telegramId },
@@ -132,13 +133,16 @@ const userRoutes: FastifyPluginAsync = async (app) => {
       return {
         id: `action-${action.id}`,
         amount: metadata.amount ?? 0,
-        description: `"${metadata.note || "manual"}" by ${action.operator?.username ?? "unknown"}`,
+        description: `"${metadata.note || "manual"}" by ${
+          action.operator?.username ?? "unknown"
+        }`,
         createdAt: action.createdAt,
       };
     });
 
     const history = [...mappedClaims, ...mappedActions].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     return reply.send(history.slice(0, take));
