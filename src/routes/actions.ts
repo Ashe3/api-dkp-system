@@ -25,7 +25,7 @@ const actionRoutes: FastifyPluginAsync = async (app) => {
       data: {
         type: "manual",
         metadata: JSON.stringify({
-          amount: Math.round(amount),
+          amount,
           note,
         }),
         operatorId,
@@ -36,7 +36,7 @@ const actionRoutes: FastifyPluginAsync = async (app) => {
     await app.prisma.user.update({
       where: { id: user.id },
       data: {
-        dkp: { increment: Math.round(amount) },
+        dkp: { increment: amount },
       },
     });
 
