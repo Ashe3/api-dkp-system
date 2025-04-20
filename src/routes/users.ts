@@ -25,33 +25,6 @@ const userRoutes: FastifyPluginAsync = async (app) => {
     const startOfWeek = fromZonedTime(startOfWeekLocal, timeZone);
     const endOfWeek = fromZonedTime(endOfWeekLocal, timeZone);
 
-    const recentClaims = await app.prisma.claim.findMany({
-      where: {
-        createdAt: {
-          gte: startOfWeek,
-          lte: endOfWeek,
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    console.log("recentClaims", recentClaims);
-
-    const recentCheckins = await app.prisma.action.findMany({
-      where: {
-        checkin: true,
-        createdAt: {
-          gte: startOfWeek,
-          lte: endOfWeek,
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    console.log("recentCheckins", recentCheckins);
-
-    console.log("startOfWeek", startOfWeek.toISOString());
-    console.log("endOfWeek", endOfWeek.toISOString());
-    console.log("serverTime now =", new Date().toISOString());
-
     const enrichedUsers = await Promise.all(
       users.map(async (user) => {
         const [claimsCount, checkinCount] = await Promise.all([
