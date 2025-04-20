@@ -8,11 +8,14 @@ const userRoutes: FastifyPluginAsync = async (app) => {
     });
 
     const now = new Date();
-    const startOfWeek = new Date(now);
+    const tzOffset = 3 * 60; // GMT+3 in minutes
+    const localNow = new Date(now.getTime() + tzOffset * 60 * 1000);
+
+    const startOfWeek = new Date(localNow);
     startOfWeek.setHours(0, 0, 0, 0);
-    startOfWeek.setDate(
-      startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7)
-    );
+    const day = startOfWeek.getDay();
+    const offsetToMonday = (day + 6) % 7;
+    startOfWeek.setDate(startOfWeek.getDate() - offsetToMonday);
 
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
