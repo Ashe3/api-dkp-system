@@ -8,8 +8,14 @@ const userRoutes: FastifyPluginAsync = async (app) => {
     });
 
     const now = new Date();
-    const tzOffset = 3 * 60; // GMT+3 in minutes
-    const localNow = new Date(now.getTime() + tzOffset * 60 * 1000);
+    const localNow = new Date(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      now.getUTCHours() + 3,
+      now.getUTCMinutes(),
+      now.getUTCSeconds()
+    );
 
     const startOfWeek = new Date(localNow);
     startOfWeek.setHours(0, 0, 0, 0);
@@ -20,6 +26,33 @@ const userRoutes: FastifyPluginAsync = async (app) => {
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
+
+    const recentClaims = await app.prisma.claim.findMany({
+      where: {
+        createdAt: {
+          gte: startOfWeek,
+          lte: endOfWeek,
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    console.log("recentClaims", recentClaims);
+
+    const recentCheckins = await app.prisma.action.findMany({
+      where: {
+        checkin: true,
+        createdAt: {
+          gte: startOfWeek,
+          lte: endOfWeek,
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    console.log("recentCheckins", recentCheckins);
+
+    console.log("startOfWeek", startOfWeek.toISOString());
+    console.log("endOfWeek", endOfWeek.toISOString());
+    console.log("serverTime now =", new Date().toISOString());
 
     const enrichedUsers = await Promise.all(
       users.map(async (user) => {
