@@ -1,3 +1,4 @@
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { FastifyPluginAsync } from "fastify";
 
 const userRoutes: FastifyPluginAsync = async (app) => {
@@ -7,20 +8,22 @@ const userRoutes: FastifyPluginAsync = async (app) => {
       orderBy: { createdAt: "desc" },
     });
 
-    const now = new Date();
-    const utcTimestamp = now.getTime();
-    const offsetMs = 3 * 60 * 60 * 1000; // GMT+3
-    const localNow = new Date(utcTimestamp + offsetMs);
+    const timeZone = "Europe/Kyiv";
+    const localNow = toZonedTime(new Date(), timeZone);
 
-    const startOfWeek = new Date(localNow);
-    startOfWeek.setHours(0, 0, 0, 0);
-    const day = startOfWeek.getDay();
+    const day = localNow.getDay();
     const offsetToMonday = (day + 6) % 7;
-    startOfWeek.setDate(startOfWeek.getDate() - offsetToMonday);
 
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
+    const startOfWeekLocal = new Date(localNow);
+    startOfWeekLocal.setHours(0, 0, 0, 0);
+    startOfWeekLocal.setDate(startOfWeekLocal.getDate() - offsetToMonday);
+
+    const endOfWeekLocal = new Date(startOfWeekLocal);
+    endOfWeekLocal.setDate(endOfWeekLocal.getDate() + 6);
+    endOfWeekLocal.setHours(23, 59, 59, 999);
+
+    const startOfWeek = fromZonedTime(startOfWeekLocal, timeZone);
+    const endOfWeek = fromZonedTime(endOfWeekLocal, timeZone);
 
     const recentClaims = await app.prisma.claim.findMany({
       where: {
