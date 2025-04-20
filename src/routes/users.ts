@@ -8,14 +8,9 @@ const userRoutes: FastifyPluginAsync = async (app) => {
     });
 
     const now = new Date();
-    const localNow = new Date(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      now.getUTCHours() + 3,
-      now.getUTCMinutes(),
-      now.getUTCSeconds()
-    );
+    const utcTimestamp = now.getTime();
+    const offsetMs = 3 * 60 * 60 * 1000; // GMT+3
+    const localNow = new Date(utcTimestamp + offsetMs);
 
     const startOfWeek = new Date(localNow);
     startOfWeek.setHours(0, 0, 0, 0);
