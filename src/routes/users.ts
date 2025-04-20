@@ -7,12 +7,50 @@ const userRoutes: FastifyPluginAsync = async (app) => {
       orderBy: { createdAt: "desc" },
     });
 
-    return reply.send(
-      users.map((user) => ({
-        ...user,
-        telegramId: user.telegramId.toString(),
-      }))
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(
+      startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7)
     );
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const enrichedUsers = await Promise.all(
+      users.map(async (user) => {
+        const [claimsCount, checkinCount] = await Promise.all([
+          app.prisma.claim.count({
+            where: {
+              userId: user.id,
+              createdAt: {
+                gte: startOfWeek,
+                lte: endOfWeek,
+              },
+            },
+          }),
+          app.prisma.action.count({
+            where: {
+              userId: user.id,
+              checkin: true,
+              createdAt: {
+                gte: startOfWeek,
+                lte: endOfWeek,
+              },
+            },
+          }),
+        ]);
+
+        return {
+          ...user,
+          telegramId: user.telegramId.toString(),
+          weeklyCheckins: (claimsCount ?? 0) + (checkinCount ?? 0),
+        };
+      })
+    );
+
+    return reply.send(enrichedUsers);
   });
 
   // POST /users — sign up

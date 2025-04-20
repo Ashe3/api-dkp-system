@@ -65,4 +65,5 @@ model Action {
   operatorId Int?
   user       User?     @relation("UserActions", fields: [userId], references: [id], onDelete: Cascade)
   userId     Int?
+  checkin    Boolean?  @default(false)
 }

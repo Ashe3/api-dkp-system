@@ -2,7 +2,8 @@ import { FastifyPluginAsync } from "fastify";
 
 const actionRoutes: FastifyPluginAsync = async (app) => {
   app.post("/actions", async (req, res) => {
-    const { targetTelegramId, amount, note, operatorId } = req.body as any;
+    const { targetTelegramId, amount, note, checkin, operatorId } =
+      req.body as any;
 
     if (
       !targetTelegramId ||
@@ -30,6 +31,7 @@ const actionRoutes: FastifyPluginAsync = async (app) => {
         }),
         operatorId,
         userId: user.id,
+        checkin,
       },
     });
 
